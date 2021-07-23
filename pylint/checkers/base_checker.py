@@ -51,6 +51,7 @@ class BaseChecker(OptionsProviderMixIn):
             self.name = self.name.lower()
         OptionsProviderMixIn.__init__(self)
         self.linter = linter
+        self.dupes = set()
 
     def __gt__(self, other):
         """Permit to sort a list of Checker by name."""
@@ -108,6 +109,11 @@ class BaseChecker(OptionsProviderMixIn):
     ):
         if not confidence:
             confidence = UNDEFINED
+        print('msgid = %s' % msgid)
+        #print('line = %s' % line)
+        #print('node = %s' % node)
+        #print('args = %s' % str(args))
+        #print(self.linter)
         self.linter.add_message(msgid, line, node, args, confidence, col_offset)
 
     def check_consistency(self):

@@ -1020,12 +1020,15 @@ class PyLinter(
         :param str filepath: path to checked file
         :param str modname: name of the checked Python module
         """
+        print("_check_file: %s" % (filepath))
         self.set_current_module(name, filepath)
         # get the module representation
         ast_node = get_ast(filepath, name)
         if ast_node is None:
+            print("ast_node is None")
             return
 
+        print("ast_node is not None")
         self._ignore_file = False
 
         self.file_state = FileState(modname)
@@ -1038,6 +1041,7 @@ class PyLinter(
             self.msgs_store
         )
         for msgid, line, args in spurious_messages:
+            print("rh - %s %s spurious" % (__file__, __line__))
             self.add_message(msgid, line, None, args)
 
     @staticmethod
@@ -1193,6 +1197,8 @@ class PyLinter(
         """
         try:
             tokens = utils.tokenize_module(ast_node)
+            print("tokens")
+            self.add_message("syntax-error", line=1, args='rhowell')
         except tokenize.TokenError as ex:
             self.add_message("syntax-error", line=ex.args[1][0], args=ex.args[0])
             return None

@@ -29,6 +29,7 @@ class MessagesHandlerMixIn:
     def __init__(self):
         self._msgs_state = {}
         self.msg_status = 0
+        self.msg_keys = set()
 
     def _checker_messages(self, checker):
         for known_checker in self._checkers[checker.lower()]:
@@ -252,14 +253,17 @@ class MessagesHandlerMixIn:
     def add_one_message(
         self, message_definition, line, node, args, confidence, col_offset
     ):
+        print("add_one_message")
         self.check_message_definition(message_definition, line, node)
         if line is None and node is not None:
             line = node.fromlineno
         if col_offset is None and hasattr(node, "col_offset"):
             col_offset = node.col_offset
 
+
         # should this message be displayed
         if not self.is_message_enabled(message_definition.msgid, line, confidence):
+            print("not enabled")
             self.file_state.handle_ignored_message(
                 self.get_message_state_scope(
                     message_definition.msgid, line, confidence
@@ -306,6 +310,23 @@ class MessagesHandlerMixIn:
             path = abspath.replace(self.reporter.path_strip_prefix, "", 1)
         else:
             path = "configuration"
+
+        print('++++++++++++++\n')
+        print('msgid=%s' % message_definition.msgid)
+        print('symbol=%s' % message_definition.symbol)
+        print('path=%s' % path)
+        print('module=%s' % module)
+        print('abspath=%s' % abspath)
+        print('obj=%s' % obj)
+        print('line=%s' % line)
+        print('node=%s' % node)
+        print('col_offset=%s' % col_offset)
+        print('args=%s' % str(args))
+        print('------------\n')
+        key = (message_definition.msgid, abspath, line)
+        if key in self.msg_keys:
+            return
+        self.msg_keys.add(key)
         # add the message
         self.reporter.handle_message(
             Message(
